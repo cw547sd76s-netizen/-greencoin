@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenCoin | ระบบธนาคารขยะดิจิทัล</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ฟอนต์ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif']
+          },
+          colors: {
+            pinksoft: '#FCE7F3',
+            pinkmain: '#EC4899',
+            pinkdark: '#BE185D',
+            pinklight: '#FDF2F8',
+            ink: '#334155'
+          },
+          boxShadow: {
+            pinksoft: '0 10px 35px rgba(236, 72, 153, 0.10)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: #fffafb;
+      color: #334155;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn .25s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .nav-active {
+      background: #FCE7F3;
+      color: #BE185D;
+    }
+
+    .modal {
+      display: none;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .toast {
+      transform: translateY(120px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .login-tab-active {
+      background: #EC4899;
+      color: #ffffff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       NAVIGATION
+  ========================== -->
+  <header id="app-header" class="sticky top-0 z-50 border-b border-pink-100 glass hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-20 flex items-center justify-between gap-4">
+
+        <!-- Logo -->
+        <button onclick="goHome()" class="flex items-center gap-3 shrink-0">
+          <div class="w-11 h-11 rounded-2xl bg-pink-500 text-white flex items-center justify-center shadow-lg shadow-pink-200">
+            ♻
+          </div>
+          <div class="text-left">
+            <div class="font-bold text-slate-800 leading-none">กรีนคอยน์</div>
+            <div class="text-xs text-pink-500 mt-1">ธนาคารขยะดิจิทัล</div>
+          </div>
+        </button>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-1 bg-white border border-pink-100 p-1.5 rounded-2xl">
+
+          <button id="nav-user" onclick="navigate('user')" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition">
+            🏠 หน้าแรก
+          </button>
+
+          <button id="nav-staff" onclick="navigate('staff')" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition">
+            ♻️ เจ้าหน้าที่
+          </button>
+
+        </nav>
+
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:flex items-center gap-2">
+            <div class="w-2 h-2 bg-pink-500 rounded-full animate-pulse"></div>
+            <span class="text-xs text-slate-500">ระบบออนไลน์</span>
+          </div>
+          <button onclick="logout()" class="text-xs sm:text-sm px-3 py-2 rounded-xl border border-pink-200 text-pink-600 hover:bg-pink-50 transition whitespace-nowrap">
+            ออกจากระบบ
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <nav class="md:hidden flex gap-2 pb-3 overflow-x-auto">
+        <button onclick="navigate('user')" id="mobile-user" class="mobile-nav-btn whitespace-nowrap px-4 py-2 rounded-xl text-sm">
+          🏠 หน้าแรก
+        </button>
+
+        <button onclick="navigate('staff')" id="mobile-staff" class="mobile-nav-btn whitespace-nowrap px-4 py-2 rounded-xl text-sm">
+          ♻️ เจ้าหน้าที่
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- =========================
+         PAGE 0 : LOGIN
+    ========================== -->
+    <section id="page-login" class="page active">
+
+      <div class="max-w-md mx-auto mt-6 sm:mt-14">
+
+        <div class="text-center mb-8">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-pink-500 text-white flex items-center justify-center text-3xl shadow-lg shadow-pink-200">
+            ♻
+          </div>
+          <h1 class="text-2xl font-bold text-slate-800 mt-4">กรีนคอยน์</h1>
+          <p class="text-sm text-slate-500 mt-1">เข้าสู่ระบบธนาคารขยะดิจิทัล</p>
+        </div>
+
+        <div class="bg-white border border-pink-100 rounded-3xl shadow-pinksoft p-6">
+
+          <!-- Tabs -->
+          <div class="grid grid-cols-2 gap-2 bg-pink-50 p-1.5 rounded-2xl mb-6">
+            <button id="login-tab-user" onclick="switchLoginTab('user')" class="login-tab-btn py-2.5 rounded-xl text-sm font-medium transition">
+              🏠 นักเรียน
+            </button>
+            <button id="login-tab-staff" onclick="switchLoginTab('staff')" class="login-tab-btn py-2.5 rounded-xl text-sm font-medium transition">
+              ♻️ เจ้าหน้าที่
+            </button>
+          </div>
+
+          <!-- Student login form -->
+          <div id="login-form-user" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">ห้องเรียน</label>
+              <select id="login-room" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300"></select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">รหัสนักเรียน</label>
+              <input id="login-user-password" type="password" inputmode="numeric" placeholder="กรอกรหัสนักเรียน" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+            </div>
+
+            <button onclick="loginAsUser()" class="w-full py-3.5 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-2xl transition shadow-lg shadow-pink-200">
+              เข้าสู่ระบบ
+            </button>
+          </div>
+
+          <!-- Staff login form -->
+          <div id="login-form-staff" class="space-y-4 hidden">
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">รหัสเจ้าหน้าที่</label>
+              <input id="login-staff-password" type="password" inputmode="numeric" placeholder="กรอกรหัสเจ้าหน้าที่" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+            </div>
+
+            <button onclick="loginAsStaff()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-2xl transition">
+              เข้าสู่ระบบ
+            </button>
+          </div>
+
+          <p id="login-error" class="text-sm text-rose-500 text-center mt-4 hidden">
+            รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง
+          </p>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =========================
+         PAGE 1 : USER
+    ========================== -->
+    <section id="page-user" class="page">
+
+      <!-- Hero -->
+      <div class="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-pink-500 to-pink-400 text-white p-7 sm:p-10 mb-7 shadow-xl shadow-pink-200">
+
+        <div class="absolute -right-16 -top-16 w-48 h-48 bg-white/10 rounded-full"></div>
+        <div class="absolute -right-5 -bottom-20 w-64 h-64 bg-white/10 rounded-full"></div>
+
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 rounded-full text-xs mb-5">
+            🌱 ทุกแต้มช่วยโลกได้
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl font-bold leading-tight">
+            เปลี่ยนขยะให้เป็นแต้ม
+            <br>
+            เปลี่ยนแต้มให้เป็นคุณค่า
+          </h1>
+
+          <p class="mt-4 text-pink-50 text-sm sm:text-base leading-relaxed">
+            ระบบธนาคารขยะดิจิทัลสำหรับโรงเรียนและชุมชน
+            ฝากขยะ สะสมแต้ม และร่วมสร้างสิ่งแวดล้อมที่ดีไปด้วยกัน
+          </p>
+        </div>
+      </div>
+
+      <!-- Room Info -->
+      <div class="bg-white border border-pink-100 rounded-3xl p-5 shadow-pinksoft mb-7">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+          <div>
+            <p class="text-xs text-pink-500 font-medium mb-1">กำลังดูข้อมูลของ</p>
+            <h2 id="current-member-name" class="font-bold text-lg text-slate-800">
+              ห้อง 6/1
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full">
+              🔒 เข้าสู่ระบบแล้ว
+            </span>
+
+            <button onclick="openRedemptionHistoryModal()" class="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-white border border-pink-200 text-pink-600 rounded-full hover:bg-pink-50 transition">
+              🧾 ประวัติการแลก
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- KPI -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
+
+        <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+          <div class="flex items-center justify-between">
+            <div class="w-11 h-11 rounded-2xl bg-pink-100 flex items-center justify-center text-xl">
+              💗
+            </div>
+            <span class="text-xs bg-pink-50 text-pink-600 px-3 py-1 rounded-full">
+              คะแนน
+            </span>
+          </div>
+
+          <p class="text-sm text-slate-500 mt-5">แต้มสะสมคงเหลือ</p>
+          <p id="user-points" class="text-3xl font-bold text-pink-600 mt-1">0</p>
+          <p class="text-xs text-slate-400 mt-1">กรีนพอยต์</p>
+        </div>
+
+        <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+          <div class="flex items-center justify-between">
+            <div class="w-11 h-11 rounded-2xl bg-rose-50 flex items-center justify-center text-xl">
+              ♻️
+            </div>
+            <span class="text-xs bg-rose-50 text-rose-600 px-3 py-1 rounded-full">
+              น้ำหนัก
+            </span>
+          </div>
+
+          <p class="text-sm text-slate-500 mt-5">ขยะที่ฝากรวม</p>
+          <p id="user-weight" class="text-3xl font-bold text-slate-800 mt-1">0</p>
+          <p class="text-xs text-slate-400 mt-1">กิโลกรัม</p>
+        </div>
+
+        <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+          <div class="flex items-center justify-between">
+            <div class="w-11 h-11 rounded-2xl bg-pink-50 flex items-center justify-center text-xl">
+              🌱
+            </div>
+            <span class="text-xs bg-pink-50 text-pink-600 px-3 py-1 rounded-full">
+              ผลกระทบ
+            </span>
+          </div>
+
+          <p class="text-sm text-slate-500 mt-5">ลดการปล่อยคาร์บอน</p>
+          <p id="user-carbon" class="text-3xl font-bold text-pink-600 mt-1">0</p>
+          <p class="text-xs text-slate-400 mt-1">กิโลกรัมคาร์บอนไดออกไซด์เทียบเท่า</p>
+        </div>
+
+      </div>
+
+      <!-- Digital Passbook -->
+      <div class="bg-white border border-pink-100 rounded-3xl shadow-pinksoft overflow-hidden mb-7">
+
+        <div class="p-6 border-b border-pink-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">📖 สมุดบัญชีขยะดิจิทัล</h2>
+            <p class="text-xs text-slate-400 mt-1">ประวัติการฝากขยะของห้อง</p>
+          </div>
+
+          <span class="text-xs px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full">
+            อัปเดตอัตโนมัติ
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-pink-50/60 text-slate-500">
+              <tr>
+                <th class="text-left px-6 py-4 font-medium">วันที่</th>
+                <th class="text-left px-6 py-4 font-medium">ประเภทขยะ</th>
+                <th class="text-right px-6 py-4 font-medium">น้ำหนัก</th>
+                <th class="text-right px-6 py-4 font-medium">แต้ม</th>
+                <th class="text-left px-6 py-4 font-medium">ผู้รับฝาก</th>
+              </tr>
+            </thead>
+
+            <tbody id="user-history"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Rates -->
+      <div class="mb-7">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-800">♻️ อัตราแลกแต้ม</h2>
+          <p class="text-xs text-slate-400 mt-1">ยิ่งแยกขยะดี ยิ่งได้แต้มดี</p>
+        </div>
+
+        <div id="rates-grid" class="grid grid-cols-2 gap-4"></div>
+      </div>
+
+      <!-- Rewards -->
+      <div>
+        <div class="mb-4 flex items-end justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">🎁 ร้านค้าแลกของรางวัล</h2>
+            <p class="text-xs text-slate-400 mt-1">ใช้แต้มของห้องแลกสิทธิพิเศษ</p>
+          </div>
+        </div>
+
+        <div id="rewards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"></div>
+      </div>
+
+    </section>
+
+    <!-- =========================
+         PAGE 2 : STAFF
+    ========================== -->
+    <section id="page-staff" class="page">
+
+      <div class="mb-7">
+        <div class="inline-flex px-3 py-1.5 rounded-full bg-pink-100 text-pink-600 text-xs mb-3">
+          ♻️ ศูนย์รับฝากขยะ
+        </div>
+
+        <h1 class="text-3xl font-bold text-slate-800">
+          หน้าสำหรับเจ้าหน้าที่
+        </h1>
+
+        <p class="text-slate-500 mt-2 text-sm">
+          บันทึกการรับฝากขยะและจัดการการแลกของรางวัล
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-6">
+
+        <!-- Deposit Form -->
+        <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-11 h-11 bg-pink-100 rounded-2xl flex items-center justify-center">
+              ♻️
+            </div>
+
+            <div>
+              <h2 class="font-bold text-slate-800">บันทึกรับฝากขยะ</h2>
+              <p class="text-xs text-slate-400">กรอกข้อมูลการฝากขยะ</p>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">
+                ห้องเรียน
+              </label>
+
+              <select id="staff-member" onchange="calculateStaffPoints()" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">
+                ประเภทขยะ
+              </label>
+
+              <select id="staff-waste" onchange="calculateStaffPoints()" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">
+                น้ำหนักขยะ
+              </label>
+
+              <div class="relative">
+                <input id="staff-weight" type="number" min="0" step="0.1" placeholder="เช่น 2.5" oninput="calculateStaffPoints()" class="w-full border border-slate-200 rounded-2xl px-4 py-3 pr-20 outline-none focus:ring-2 focus:ring-pink-300">
+
+                <span class="absolute right-4 top-3.5 text-sm text-slate-400">
+                  กิโลกรัม
+                </span>
+              </div>
+            </div>
+
+            <!-- Calculation -->
+            <div class="bg-pink-50 rounded-2xl p-5">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-500">แต้มที่จะได้รับ</span>
+
+                <span class="text-2xl font-bold text-pink-600">
+                  <span id="staff-calculated-points">0</span>
+                  แต้ม
+                </span>
+              </div>
+            </div>
+
+            <button onclick="saveDeposit()" class="w-full py-3.5 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-2xl transition shadow-lg shadow-pink-200">
+              บันทึกการรับฝาก
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Redeem -->
+        <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-11 h-11 bg-pink-100 rounded-2xl flex items-center justify-center">
+              🎁
+            </div>
+
+            <div>
+              <h2 class="font-bold text-slate-800">ตัดแต้มแลกของรางวัล</h2>
+              <p class="text-xs text-slate-400">ดำเนินการแทนห้อง</p>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">
+                ห้องเรียน
+              </label>
+
+              <select id="staff-redeem-member" onchange="updateRedeemPreview()" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">
+                ของรางวัล
+              </label>
+
+              <select id="staff-reward" onchange="updateRedeemPreview()" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </select>
+            </div>
+
+            <div class="bg-slate-50 rounded-2xl p-5 space-y-3">
+
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-500">แต้มคงเหลือ</span>
+                <span id="redeem-current-points" class="font-semibold text-slate-800">0</span>
+              </div>
+
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-500">ใช้แต้ม</span>
+                <span id="redeem-cost" class="font-semibold text-pink-600">0</span>
+              </div>
+
+              <div class="border-t border-slate-200 pt-3 flex justify-between">
+                <span class="text-sm text-slate-600">แต้มหลังแลก</span>
+                <span id="redeem-after-points" class="font-bold text-slate-800">0</span>
+              </div>
+
+            </div>
+
+            <button onclick="redeemFromStaff()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-2xl transition">
+              ยืนยันการตัดแต้ม
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="mt-6 bg-white border border-pink-100 rounded-3xl shadow-pinksoft overflow-hidden">
+
+        <div class="p-6 border-b border-pink-100">
+          <h2 class="font-bold text-slate-800">รายการล่าสุด</h2>
+          <p class="text-xs text-slate-400 mt-1">ข้อมูลการฝากขยะล่าสุดในระบบ</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+
+            <thead class="bg-pink-50/60">
+              <tr>
+                <th class="text-left px-6 py-4">วันที่</th>
+                <th class="text-left px-6 py-4">ห้องเรียน</th>
+                <th class="text-left px-6 py-4">ประเภท</th>
+                <th class="text-right px-6 py-4">น้ำหนัก</th>
+                <th class="text-right px-6 py-4">แต้ม</th>
+              </tr>
+            </thead>
+
+            <tbody id="staff-recent-history"></tbody>
+
+          </table>
+        </div>
+      </div>
+
+      <!-- Redemption History -->
+      <div class="mt-6 bg-white border border-pink-100 rounded-3xl shadow-pinksoft overflow-hidden">
+
+        <div class="p-6 border-b border-pink-100">
+          <h2 class="font-bold text-slate-800">🎁 ประวัติการแลกของรางวัล</h2>
+          <p class="text-xs text-slate-400 mt-1">ห้องไหนใช้แต้มแลกอะไรไป เหลือเท่าไหร่</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+
+            <thead class="bg-pink-50/60">
+              <tr>
+                <th class="text-left px-6 py-4">วันที่</th>
+                <th class="text-left px-6 py-4">ห้องเรียน</th>
+                <th class="text-left px-6 py-4">ของรางวัล</th>
+                <th class="text-right px-6 py-4">แต้มที่ใช้</th>
+                <th class="text-right px-6 py-4">แต้มคงเหลือ</th>
+              </tr>
+            </thead>
+
+            <tbody id="staff-redemption-history"></tbody>
+
+          </table>
+        </div>
+      </div>
+
+      <!-- Registration & Management -->
+      <div class="mt-8">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-800">⚙️ ลงทะเบียนและจัดการระบบ</h2>
+          <p class="text-xs text-slate-400 mt-1">เพิ่มห้องเรียน/เจ้าหน้าที่ใหม่ หรือล้างข้อมูลเมื่อจบการศึกษา</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+
+          <!-- Register Room -->
+          <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-11 h-11 bg-pink-100 rounded-2xl flex items-center justify-center">🏫</div>
+              <div>
+                <h3 class="font-bold text-slate-800">ลงทะเบียนห้องเรียนใหม่</h3>
+                <p class="text-xs text-slate-400">เพิ่มห้องที่ยังไม่มีในระบบ</p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2">ชื่อห้อง เช่น 6/8</label>
+                <input id="reg-room-name" type="text" placeholder="6/8" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2">รหัสนักเรียน (ใช้เป็นรหัสผ่าน)</label>
+                <input id="reg-room-studentid" type="text" inputmode="numeric" placeholder="เช่น 18888" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2">ชื่อนักเรียนตัวแทนห้อง</label>
+                <input id="reg-room-studentname" type="text" placeholder="ชื่อ-นามสกุล" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </div>
+              <button onclick="registerRoom()" class="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-2xl transition">
+                เพิ่มห้องเรียน
+              </button>
+            </div>
+          </div>
+
+          <!-- Register Staff -->
+          <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-11 h-11 bg-pink-100 rounded-2xl flex items-center justify-center">👤</div>
+              <div>
+                <h3 class="font-bold text-slate-800">ลงทะเบียนเจ้าหน้าที่ใหม่</h3>
+                <p class="text-xs text-slate-400">เพิ่มเจ้าหน้าที่คนใหม่เข้าระบบ</p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2">รหัสเจ้าหน้าที่ (ใช้เป็นรหัสผ่าน)</label>
+                <input id="reg-staff-id" type="text" inputmode="numeric" placeholder="เช่น 20040" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-2">ชื่อเจ้าหน้าที่</label>
+                <input id="reg-staff-name" type="text" placeholder="ชื่อ-นามสกุล" class="w-full border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-pink-300">
+              </div>
+              <button onclick="registerStaff()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-2xl transition">
+                เพิ่มเจ้าหน้าที่
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6 mt-6">
+
+          <!-- Rooms Management -->
+          <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+            <div class="mb-5">
+              <h3 class="font-bold text-slate-800">🏫 จัดการห้องเรียน</h3>
+              <p class="text-xs text-slate-400 mt-1">ล้างประวัติ หรือลบห้องเมื่อจบการศึกษา (ม.3 / ม.6)</p>
+            </div>
+            <div id="rooms-management-list" class="space-y-3"></div>
+          </div>
+
+          <!-- Staff Management -->
+          <div class="bg-white border border-pink-100 rounded-3xl p-6 shadow-pinksoft">
+            <div class="mb-5">
+              <h3 class="font-bold text-slate-800">👤 จัดการบัญชีเจ้าหน้าที่</h3>
+              <p class="text-xs text-slate-400 mt-1">ต้องมีเจ้าหน้าที่อย่างน้อย 1 คนเสมอ</p>
+            </div>
+            <div id="staff-management-list" class="space-y-3"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- =========================
+       REWARD CONFIRM MODAL
+  ========================== -->
+  <div id="reward-modal" class="modal fixed inset-0 z-[100] items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
+
+    <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
+
+      <div class="text-center">
+        <div id="modal-reward-icon" class="w-16 h-16 mx-auto rounded-3xl bg-pink-100 flex items-center justify-center text-3xl">
+          🎁
+        </div>
+
+        <h2 id="modal-reward-name" class="font-bold text-xl text-slate-800 mt-4">
+          ของรางวัล
+        </h2>
+
+        <p class="text-sm text-slate-500 mt-2">
+          ห้องของคุณต้องการใช้แต้มแลกของรางวัลนี้หรือไม่?
+        </p>
+
+        <div class="bg-pink-50 rounded-2xl p-4 mt-5">
+          <div class="flex justify-between text-sm">
+            <span>แต้มที่ต้องใช้</span>
+            <strong id="modal-reward-cost" class="text-pink-600">0</strong>
+          </div>
+
+          <div class="flex justify-between text-sm mt-2">
+            <span>แต้มคงเหลือหลังแลก</span>
+            <strong id="modal-reward-after">0</strong>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <button onclick="closeRewardModal()" class="py-3 rounded-2xl border border-slate-200 text-slate-600">
+            ยกเลิก
+          </button>
+
+          <button onclick="confirmReward()" class="py-3 rounded-2xl bg-pink-500 text-white font-medium">
+            ยืนยันการแลก
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================
+       REDEMPTION HISTORY (RECEIPT) MODAL
+  ========================== -->
+  <div id="redemption-history-modal" class="modal fixed inset-0 z-[100] items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
+
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl max-h-[85vh] flex flex-col">
+
+      <div class="p-6 border-b border-pink-100 flex items-start justify-between gap-4">
+        <div>
+          <h2 class="font-bold text-lg text-slate-800">🧾 ใบเสร็จการแลกของรางวัล</h2>
+          <p id="redemption-history-room" class="text-xs text-slate-400 mt-1">ห้อง 6/1</p>
+        </div>
+        <button onclick="closeRedemptionHistoryModal()" class="text-slate-400 hover:text-slate-600 text-xl leading-none shrink-0">
+          ✕
+        </button>
+      </div>
+
+      <div id="redemption-history-list" class="overflow-y-auto p-6 space-y-3"></div>
+
+    </div>
+  </div>
+
+  <!-- =========================
+       TOAST
+  ========================== -->
+  <div id="toast" class="toast fixed bottom-5 left-1/2 -translate-x-1/2 z-[200] bg-slate-800 text-white px-5 py-3 rounded-2xl shadow-xl text-sm">
+    ดำเนินการสำเร็จ
+  </div>
+
+  <script>
+    /* =========================================================
+   GREENCOIN APPLICATION
+========================================================= */
+    const STORAGE_KEY = "greencoin_data_v3";
+    const SESSION_KEY = "greencoin_session_v3";
+
+    /* ---------------------------------------------------------
+       ข้อมูลเริ่มต้น (ใช้ครั้งแรกเท่านั้น ภายหลังแก้ไขผ่านหน้าลงทะเบียนได้)
+    --------------------------------------------------------- */
+    const INITIAL_ROOMS = [
+      { id: 1, room: "6/1", studentId: "18187", studentName: "ณัฐณิชา ขวัญคำ" },
+      { id: 2, room: "6/2", studentId: "18191", studentName: "พิชชาพร คงทอง" },
+      { id: 3, room: "6/3", studentId: "18560", studentName: "เจียรธิชา จรัสบวรทรัพย์" },
+      { id: 4, room: "6/4", studentId: "18227", studentName: "ปานไพลิน กิมาคม" },
+      { id: 5, room: "6/5", studentId: "18233", studentName: "ศศิวิมล ระเมาะ" },
+      { id: 6, room: "6/6", studentId: "18203", studentName: "อุซมี มณีโส๊ะ" },
+      { id: 7, room: "6/7", studentId: "18490", studentName: "อนุธิดา โตะเขียว" }
+    ];
+
+    const INITIAL_STAFF_ACCOUNTS = [
+      { id: "20039", name: "นัจญวา ติงหวัง" }
+    ];
+
+    const defaultData = {
+      rooms: INITIAL_ROOMS,
+      staffAccounts: INITIAL_STAFF_ACCOUNTS,
+      members: INITIAL_ROOMS.map(r => ({ id: r.id, points: 0 })),
+      rates: {
+        "พลาสติก": 10,
+        "กระดาษ": 8
+      },
+      carbonFactors: {
+        "พลาสติก": 1.5,
+        "กระดาษ": 1.1
+      },
+      deposits: [
+        { id: 1, memberId: 1, date: "01/08/2569", type: "พลาสติก", weight: 2.5, points: 25, collector: "นัจญวา ติงหวัง" },
+        { id: 2, memberId: 1, date: "03/08/2569", type: "กระดาษ", weight: 3, points: 24, collector: "นัจญวา ติงหวัง" },
+        { id: 3, memberId: 2, date: "02/08/2569", type: "พลาสติก", weight: 1.5, points: 15, collector: "นัจญวา ติงหวัง" },
+        { id: 4, memberId: 2, date: "04/08/2569", type: "กระดาษ", weight: 4, points: 32, collector: "นัจญวา ติงหวัง" },
+        { id: 5, memberId: 3, date: "01/08/2569", type: "กระดาษ", weight: 2, points: 16, collector: "นัจญวา ติงหวัง" },
+        { id: 6, memberId: 3, date: "05/08/2569", type: "พลาสติก", weight: 1.8, points: 18, collector: "นัจญวา ติงหวัง" },
+        { id: 7, memberId: 4, date: "06/08/2569", type: "พลาสติก", weight: 2.2, points: 22, collector: "นัจญวา ติงหวัง" },
+        { id: 8, memberId: 4, date: "07/08/2569", type: "พลาสติก", weight: 3.5, points: 35, collector: "นัจญวา ติงหวัง" },
+        { id: 9, memberId: 5, date: "08/08/2569", type: "กระดาษ", weight: 2.5, points: 20, collector: "นัจญวา ติงหวัง" },
+        { id: 10, memberId: 5, date: "09/08/2569", type: "กระดาษ", weight: 4, points: 32, collector: "นัจญวา ติงหวัง" },
+        { id: 11, memberId: 6, date: "10/08/2569", type: "พลาสติก", weight: 2, points: 20, collector: "นัจญวา ติงหวัง" },
+        { id: 12, memberId: 7, date: "11/08/2569", type: "กระดาษ", weight: 1.5, points: 12, collector: "นัจญวา ติงหวัง" }
+      ],
+      rewards: [
+        { id: 1, name: "สมุดรักษ์โลก", cost: 30, icon: "📔" },
+        { id: 2, name: "แก้วน้ำพกพา", cost: 50, icon: "🥤" },
+        { id: 3, name: "ถุงผ้ารักษ์โลก", cost: 70, icon: "🛍️" },
+        { id: 4, name: "ต้นไม้กระถางเล็ก", cost: 90, icon: "🌱" },
+        { id: 5, name: "ชุดอุปกรณ์การเรียน", cost: 120, icon: "✏️" }
+      ],
+      redemptions: []
+    };
+    /* =========================================================
+       STATE
+    ========================================================= */
+    let data = loadData();
+    let session = loadSession();
+    let currentMemberId = session?.roomId || (data.rooms[0] ? data.rooms[0].id : null);
+    let selectedRewardId = null;
+    /* =========================================================
+       STORAGE
+    ========================================================= */
+    function loadData() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        const cloned = JSON.parse(JSON.stringify(defaultData));
+        calculateInitialPoints(cloned);
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(cloned)
+        );
+        return cloned;
+      }
+      return JSON.parse(stored);
+    }
+
+    function saveData() {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+      );
+    }
+
+    function loadSession() {
+      const stored = localStorage.getItem(SESSION_KEY);
+      return stored ? JSON.parse(stored) : null;
+    }
+
+    function saveSession(newSession) {
+      session = newSession;
+      if (newSession) {
+        localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
+      } else {
+        localStorage.removeItem(SESSION_KEY);
+      }
+    }
+
+    function calculateInitialPoints(dataset) {
+      dataset.members.forEach(member => {
+        const memberDeposits =
+          dataset.deposits.filter(
+            deposit => deposit.memberId === member.id
+          );
+        const totalPoints =
+          memberDeposits.reduce(
+            (sum, deposit) => sum + deposit.points,
+            0
+          );
+        const totalRedeemed =
+          dataset.redemptions
+          .filter(item => item.memberId === member.id)
+          .reduce((sum, item) => sum + item.cost, 0);
+        member.points = totalPoints - totalRedeemed;
+      });
+    }
+    /* =========================================================
+       UTILITY
+    ========================================================= */
+    function formatNumber(number) {
+      return Number(number || 0).toLocaleString(
+        "th-TH", {
+          maximumFractionDigits: 2
+        }
+      );
+    }
+
+    function getMember(id) {
+      return data.members.find(
+        member => member.id === Number(id)
+      );
+    }
+
+    function getRoomInfo(id) {
+      return data.rooms.find(
+        room => room.id === Number(id)
+      );
+    }
+
+    function getRoomName(id) {
+      const room = getRoomInfo(id);
+      return room ? `ห้อง ${room.room} (${room.studentName})` : "-";
+    }
+
+    function currentStaffName() {
+      if (session && session.role === "staff" && session.staffId) {
+        const staff = data.staffAccounts.find(
+          account => account.id === session.staffId
+        );
+        if (staff) return staff.name;
+      }
+      return "เจ้าหน้าที่";
+    }
+
+    function getTodayThai() {
+      const now = new Date();
+      const day =
+        String(now.getDate()).padStart(2, "0");
+      const month =
+        String(now.getMonth() + 1).padStart(2, "0");
+      const year =
+        now.getFullYear() + 543;
+      return `${day}/${month}/${year}`;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2500);
+    }
+    /* =========================================================
+       LOGIN / LOGOUT
+    ========================================================= */
+    function populateLoginRoomSelector() {
+      const select = document.getElementById("login-room");
+      select.innerHTML = data.rooms
+        .map(r => `<option value="${r.id}">${r.room}</option>`)
+        .join("") || `<option value="">ยังไม่มีห้องในระบบ</option>`;
+    }
+
+    function switchLoginTab(tab) {
+      const isUser = tab === "user";
+      document.getElementById("login-tab-user")
+        .classList.toggle("login-tab-active", isUser);
+      document.getElementById("login-tab-staff")
+        .classList.toggle("login-tab-active", !isUser);
+      document.getElementById("login-form-user")
+        .classList.toggle("hidden", !isUser);
+      document.getElementById("login-form-staff")
+        .classList.toggle("hidden", isUser);
+      hideLoginError();
+    }
+
+    function showLoginError() {
+      document.getElementById("login-error").classList.remove("hidden");
+    }
+
+    function hideLoginError() {
+      document.getElementById("login-error").classList.add("hidden");
+    }
+
+    function loginAsUser() {
+      const roomId = Number(document.getElementById("login-room").value);
+      const password = document.getElementById("login-user-password").value.trim();
+      const roomInfo = getRoomInfo(roomId);
+      if (!roomInfo || password !== roomInfo.studentId) {
+        showLoginError();
+        return;
+      }
+      hideLoginError();
+      document.getElementById("login-user-password").value = "";
+      currentMemberId = roomId;
+      saveSession({ role: "user", roomId });
+      enterApp("user");
+    }
+
+    function loginAsStaff() {
+      const password = document.getElementById("login-staff-password").value.trim();
+      const matched = data.staffAccounts.find(account => account.id === password);
+      if (!matched) {
+        showLoginError();
+        return;
+      }
+      hideLoginError();
+      document.getElementById("login-staff-password").value = "";
+      saveSession({ role: "staff", staffId: matched.id });
+      enterApp("staff");
+    }
+
+    function logout() {
+      saveSession(null);
+      document.getElementById("app-header").classList.add("hidden");
+      document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+      document.getElementById("page-login").classList.add("active");
+      populateLoginRoomSelector();
+      switchLoginTab("user");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function enterApp(role) {
+      document.getElementById("app-header").classList.remove("hidden");
+      const showUserNav = role === "user";
+      document.getElementById("nav-user").classList.toggle("hidden", !showUserNav);
+      document.getElementById("nav-staff").classList.toggle("hidden", showUserNav);
+      const mobileUser = document.getElementById("mobile-user");
+      const mobileStaff = document.getElementById("mobile-staff");
+      if (mobileUser) mobileUser.classList.toggle("hidden", !showUserNav);
+      if (mobileStaff) mobileStaff.classList.toggle("hidden", showUserNav);
+      navigate(role);
+    }
+
+    function goHome() {
+      if (!session) return;
+      navigate(session.role);
+    }
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
+    function navigate(page) {
+      // แต่ละบทบาทเข้าถึงได้เฉพาะหน้าของตัวเอง
+      if (session) {
+        if (session.role === "user" && page !== "user") page = "user";
+        if (session.role === "staff" && page !== "staff") page = "staff";
+      }
+      document.querySelectorAll(".page")
+        .forEach(element => {
+          element.classList.remove("active");
+        });
+      document
+        .getElementById(`page-${page}`)
+        .classList.add("active");
+      document.querySelectorAll(".nav-btn")
+        .forEach(button => {
+          button.classList.remove("nav-active");
+        });
+      document
+        .getElementById(`nav-${page}`)
+        ?.classList.add("nav-active");
+      document.querySelectorAll(".mobile-nav-btn")
+        .forEach(button => {
+          button.classList.remove(
+            "bg-pink-100",
+            "text-pink-600"
+          );
+          button.classList.add(
+            "bg-white",
+            "text-slate-500"
+          );
+        });
+      const mobileButton =
+        document.getElementById(`mobile-${page}`);
+      if (mobileButton) {
+        mobileButton.classList.remove(
+          "bg-white",
+          "text-slate-500"
+        );
+        mobileButton.classList.add(
+          "bg-pink-100",
+          "text-pink-600"
+        );
+      }
+      if (page === "staff") {
+        renderStaff();
+      }
+      if (page === "user") {
+        renderUser();
+      }
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+    /* =========================================================
+       USER PAGE
+    ========================================================= */
+    function populateMemberSelectors() {
+      const selectors = [
+        document.getElementById("staff-member"),
+        document.getElementById("staff-redeem-member")
+      ];
+      selectors.forEach(select => {
+        if (!select) return;
+        const previousValue = select.value;
+        select.innerHTML = data.rooms
+          .map(room => `
+        <option value="${room.id}">
+          ${getRoomName(room.id)}
+        </option>
+      `)
+          .join("") || `<option value="">ยังไม่มีห้องในระบบ</option>`;
+        if (
+          previousValue &&
+          data.rooms.some(
+            room => room.id === Number(previousValue)
+          )
+        ) {
+          select.value = previousValue;
+        }
+      });
+      const staffMemberSelect = document.getElementById("staff-member");
+      const staffRedeemSelect = document.getElementById("staff-redeem-member");
+      if (staffMemberSelect && !staffMemberSelect.value && currentMemberId) {
+        staffMemberSelect.value = currentMemberId;
+      }
+      if (staffRedeemSelect && !staffRedeemSelect.value && currentMemberId) {
+        staffRedeemSelect.value = currentMemberId;
+      }
+    }
+
+    function renderUser() {
+      const member =
+        getMember(currentMemberId);
+      if (!member) return;
+      document.getElementById(
+        "current-member-name"
+      ).textContent = getRoomName(currentMemberId);
+      const memberDeposits =
+        data.deposits.filter(
+          deposit => deposit.memberId === member.id
+        );
+      const totalWeight =
+        memberDeposits.reduce(
+          (sum, item) => sum + Number(item.weight),
+          0
+        );
+      const totalCarbon =
+        memberDeposits.reduce(
+          (sum, item) =>
+          sum +
+          Number(item.weight) *
+          Number(data.carbonFactors[item.type]),
+          0
+        );
+      document.getElementById("user-points").textContent =
+        formatNumber(member.points);
+      document.getElementById("user-weight").textContent =
+        formatNumber(totalWeight);
+      document.getElementById("user-carbon").textContent =
+        formatNumber(totalCarbon);
+      renderUserHistory(memberDeposits);
+      renderRates();
+      renderRewards();
+    }
+
+    function renderUserHistory(deposits) {
+      const tbody =
+        document.getElementById("user-history");
+      if (!deposits.length) {
+        tbody.innerHTML = `
+      <tr>
+        <td colspan="5"
+          class="px-6 py-10 text-center text-slate-400">
+          ยังไม่มีประวัติการฝากขยะ
+        </td>
+      </tr>
+    `;
+        return;
+      }
+      tbody.innerHTML =
+        deposits
+        .slice()
+        .reverse()
+        .map(item => `
+        <tr class="border-t border-slate-100 hover:bg-pink-50/30">
+
+          <td class="px-6 py-4 whitespace-nowrap">
+            ${item.date}
+          </td>
+
+          <td class="px-6 py-4">
+            <span class="inline-flex px-2.5 py-1 rounded-lg bg-pink-50 text-pink-600 text-xs">
+              ${item.type}
+            </span>
+          </td>
+
+          <td class="px-6 py-4 text-right">
+            ${formatNumber(item.weight)} กก.
+          </td>
+
+          <td class="px-6 py-4 text-right font-semibold text-pink-600">
+            +${formatNumber(item.points)}
+          </td>
+
+          <td class="px-6 py-4 whitespace-nowrap text-slate-500">
+            ${item.collector}
+          </td>
+
+        </tr>
+      `)
+        .join("");
+    }
+
+    function renderRates() {
+      const icons = {
+        "พลาสติก": "🥤",
+        "กระดาษ": "📄"
+      };
+      const colors = {
+        "พลาสติก": "bg-pink-50",
+        "กระดาษ": "bg-rose-50"
+      };
+      document.getElementById("rates-grid").innerHTML =
+        Object.entries(data.rates)
+        .map(([type, rate]) => `
+
+        <div class="bg-white border border-pink-100 rounded-3xl p-5 shadow-pinksoft">
+
+          <div class="w-11 h-11 ${colors[type]} rounded-2xl flex items-center justify-center text-xl">
+            ${icons[type]}
+          </div>
+
+          <p class="font-semibold text-slate-800 mt-4">
+            ${type}
+          </p>
+
+          <div class="mt-2">
+            <span class="text-2xl font-bold text-pink-600">
+              ${formatNumber(rate)}
+            </span>
+
+            <span class="text-xs text-slate-400">
+              แต้ม / กก.
+            </span>
+          </div>
+
+        </div>
+
+      `)
+        .join("");
+    }
+
+    function renderRewards() {
+      const container =
+        document.getElementById("rewards-grid");
+      const member =
+        getMember(currentMemberId);
+      if (!member) {
+        container.innerHTML = "";
+        return;
+      }
+      container.innerHTML =
+        data.rewards
+        .map(reward => {
+          const canRedeem =
+            member.points >= reward.cost;
+          return `
+
+          <div class="bg-white border border-pink-100 rounded-3xl p-5 shadow-pinksoft flex flex-col">
+
+            <div class="w-14 h-14 rounded-2xl bg-pink-50 flex items-center justify-center text-3xl">
+              ${reward.icon}
+            </div>
+
+            <h3 class="font-semibold text-slate-800 mt-4">
+              ${reward.name}
+            </h3>
+
+            <div class="mt-2 mb-5">
+              <span class="font-bold text-pink-600">
+                ${formatNumber(reward.cost)}
+              </span>
+
+              <span class="text-xs text-slate-400">
+                แต้ม
+              </span>
+            </div>
+
+            <button
+              onclick="openRewardModal(${reward.id})"
+              ${!canRedeem ? "disabled" : ""}
+              class="mt-auto w-full py-2.5 rounded-xl text-sm font-medium transition
+              ${canRedeem
+                ? "bg-pink-500 hover:bg-pink-600 text-white"
+                : "bg-slate-100 text-slate-400 cursor-not-allowed"}">
+
+              ${canRedeem
+                ? "แลกของรางวัล"
+                : "แต้มไม่เพียงพอ"}
+
+            </button>
+
+          </div>
+
+        `;
+        })
+        .join("");
+    }
+    /* =========================================================
+       REWARD MODAL
+    ========================================================= */
+    function openRewardModal(rewardId) {
+      const reward =
+        data.rewards.find(
+          item => item.id === rewardId
+        );
+      const member =
+        getMember(currentMemberId);
+      if (!reward || !member) return;
+      if (member.points < reward.cost) {
+        showToast("แต้มของห้องไม่เพียงพอสำหรับของรางวัลนี้");
+        return;
+      }
+      selectedRewardId = rewardId;
+      document.getElementById(
+        "modal-reward-icon"
+      ).textContent = reward.icon;
+      document.getElementById(
+        "modal-reward-name"
+      ).textContent = reward.name;
+      document.getElementById(
+          "modal-reward-cost"
+        ).textContent =
+        `${formatNumber(reward.cost)} แต้ม`;
+      document.getElementById(
+          "modal-reward-after"
+        ).textContent =
+        `${formatNumber(member.points - reward.cost)} แต้ม`;
+      document
+        .getElementById("reward-modal")
+        .classList.add("active");
+    }
+
+    function closeRewardModal() {
+      selectedRewardId = null;
+      document
+        .getElementById("reward-modal")
+        .classList.remove("active");
+    }
+    /* =========================================================
+       REDEMPTION HISTORY (RECEIPT) MODAL
+    ========================================================= */
+    function openRedemptionHistoryModal() {
+      document.getElementById(
+        "redemption-history-room"
+      ).textContent = getRoomName(currentMemberId);
+      renderRedemptionHistoryList();
+      document
+        .getElementById("redemption-history-modal")
+        .classList.add("active");
+    }
+
+    function closeRedemptionHistoryModal() {
+      document
+        .getElementById("redemption-history-modal")
+        .classList.remove("active");
+    }
+
+    function renderRedemptionHistoryList() {
+      const container =
+        document.getElementById("redemption-history-list");
+      const items =
+        data.redemptions
+        .filter(item => item.memberId === currentMemberId)
+        .slice()
+        .reverse();
+
+      if (!items.length) {
+        container.innerHTML = `
+          <p class="text-sm text-slate-400 text-center py-10">
+            ยังไม่มีประวัติการแลกของรางวัล
+          </p>
+        `;
+        return;
+      }
+
+      container.innerHTML =
+        items
+        .map(item => `
+
+        <div class="border border-dashed border-pink-200 rounded-2xl p-4 bg-pink-50/40">
+          <div class="flex items-center gap-3">
+
+            <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center text-xl shadow-sm shrink-0">
+              ${item.icon || "🎁"}
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-slate-800 truncate">
+                ${item.rewardName}
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                ${item.date}
+              </p>
+            </div>
+
+            <div class="text-right shrink-0">
+              <p class="font-bold text-pink-600">
+                -${formatNumber(item.cost)}
+              </p>
+              <p class="text-[10px] text-slate-400">
+                แต้ม
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      `)
+        .join("");
+    }
+
+    function confirmReward() {
+      if (!selectedRewardId) return;
+      const reward =
+        data.rewards.find(
+          item => item.id === selectedRewardId
+        );
+      const member =
+        getMember(currentMemberId);
+      if (!reward || !member) return;
+      if (member.points < reward.cost) {
+        showToast("แต้มไม่เพียงพอ");
+        closeRewardModal();
+        return;
+      }
+      member.points -= reward.cost;
+      data.redemptions.push({
+        id: Date.now(),
+        memberId: member.id,
+        rewardId: reward.id,
+        rewardName: reward.name,
+        icon: reward.icon,
+        cost: reward.cost,
+        date: getTodayThai()
+      });
+      saveData();
+      closeRewardModal();
+      renderUser();
+      showToast(
+        `แลก${reward.name}สำเร็จ`
+      );
+    }
+    /* =========================================================
+       STAFF PAGE
+    ========================================================= */
+    function populateWasteSelector() {
+      const select =
+        document.getElementById("staff-waste");
+      select.innerHTML =
+        Object.keys(data.rates)
+        .map(type => `
+        <option value="${type}">
+          ${type}
+        </option>
+      `)
+        .join("");
+    }
+
+    function calculateStaffPoints() {
+      const type =
+        document.getElementById("staff-waste").value;
+      const weight =
+        Number(
+          document.getElementById("staff-weight").value
+        );
+      const rate =
+        Number(data.rates[type] || 0);
+      const points =
+        weight > 0 ?
+        weight * rate :
+        0;
+      document.getElementById(
+          "staff-calculated-points"
+        ).textContent =
+        formatNumber(points);
+    }
+
+    function saveDeposit() {
+      const memberId =
+        Number(
+          document.getElementById("staff-member").value
+        );
+      const type =
+        document.getElementById("staff-waste").value;
+      const weight =
+        Number(
+          document.getElementById("staff-weight").value
+        );
+      if (!memberId || !type || weight <= 0) {
+        showToast(
+          "กรุณากรอกข้อมูลการฝากขยะให้ครบถ้วน"
+        );
+        return;
+      }
+      const points =
+        weight * data.rates[type];
+      const member =
+        getMember(memberId);
+      member.points += points;
+      data.deposits.push({
+        id: Date.now(),
+        memberId,
+        date: getTodayThai(),
+        type,
+        weight,
+        points,
+        collector: currentStaffName()
+      });
+      saveData();
+      document.getElementById(
+        "staff-weight"
+      ).value = "";
+      document.getElementById(
+        "staff-calculated-points"
+      ).textContent = "0";
+      renderStaff();
+      showToast(
+        `บันทึกสำเร็จ ห้องได้รับ ${formatNumber(points)} แต้ม`
+      );
+    }
+
+    function renderStaff() {
+      populateMemberSelectors();
+      populateWasteSelector();
+      calculateStaffPoints();
+      updateRedeemPreview();
+      renderStaffHistory();
+      renderStaffRedemptionHistory();
+      renderRoomsManagement();
+      renderStaffAccountsList();
+    }
+
+    function renderStaffHistory() {
+      const tbody =
+        document.getElementById(
+          "staff-recent-history"
+        );
+      tbody.innerHTML =
+        data.deposits
+        .slice()
+        .reverse()
+        .slice(0, 8)
+        .map(item => {
+          return `
+
+          <tr class="border-t border-slate-100">
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${item.date}
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${getRoomName(item.memberId)}
+            </td>
+
+            <td class="px-6 py-4">
+              <span class="px-2.5 py-1 rounded-lg bg-pink-50 text-pink-600 text-xs">
+                ${item.type}
+              </span>
+            </td>
+
+            <td class="px-6 py-4 text-right">
+              ${formatNumber(item.weight)} กก.
+            </td>
+
+            <td class="px-6 py-4 text-right font-semibold text-pink-600">
+              +${formatNumber(item.points)}
+            </td>
+
+          </tr>
+
+        `;
+        })
+        .join("");
+    }
+
+    function renderStaffRedemptionHistory() {
+      const tbody =
+        document.getElementById("staff-redemption-history");
+      if (!tbody) return;
+
+      const items =
+        data.redemptions
+        .slice()
+        .reverse()
+        .slice(0, 10);
+
+      if (!items.length) {
+        tbody.innerHTML = `
+      <tr>
+        <td colspan="5"
+          class="px-6 py-10 text-center text-slate-400">
+          ยังไม่มีประวัติการแลกของรางวัล
+        </td>
+      </tr>
+    `;
+        return;
+      }
+
+      tbody.innerHTML =
+        items
+        .map(item => {
+          const member = getMember(item.memberId);
+          return `
+
+          <tr class="border-t border-slate-100">
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${item.date}
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${getRoomName(item.memberId)}
+            </td>
+
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-pink-50 text-pink-600 text-xs">
+                ${item.icon || "🎁"} ${item.rewardName}
+              </span>
+            </td>
+
+            <td class="px-6 py-4 text-right font-semibold text-pink-600">
+              -${formatNumber(item.cost)}
+            </td>
+
+            <td class="px-6 py-4 text-right text-slate-600">
+              ${formatNumber(member ? member.points : 0)}
+            </td>
+
+          </tr>
+
+        `;
+        })
+        .join("");
+    }
+
+    function populateRewardSelector() {
+      const select =
+        document.getElementById("staff-reward");
+      select.innerHTML =
+        data.rewards
+        .map(reward => `
+        <option value="${reward.id}">
+          ${reward.icon} ${reward.name} — ${formatNumber(reward.cost)} แต้ม
+        </option>
+      `)
+        .join("");
+    }
+
+    function updateRedeemPreview() {
+      populateRewardSelector();
+      const memberId =
+        Number(
+          document.getElementById(
+            "staff-redeem-member"
+          ).value
+        );
+      const rewardId =
+        Number(
+          document.getElementById(
+            "staff-reward"
+          ).value
+        );
+      const member =
+        getMember(memberId);
+      const reward =
+        data.rewards.find(
+          item => item.id === rewardId
+        );
+      if (!member || !reward) return;
+      const after =
+        member.points - reward.cost;
+      document.getElementById(
+          "redeem-current-points"
+        ).textContent =
+        formatNumber(member.points);
+      document.getElementById(
+          "redeem-cost"
+        ).textContent =
+        formatNumber(reward.cost);
+      document.getElementById(
+          "redeem-after-points"
+        ).textContent =
+        formatNumber(
+          Math.max(after, 0)
+        );
+      document.getElementById(
+          "redeem-after-points"
+        ).className =
+        after >= 0 ?
+        "font-bold text-slate-800" :
+        "font-bold text-red-500";
+    }
+
+    function redeemFromStaff() {
+      const memberId =
+        Number(
+          document.getElementById(
+            "staff-redeem-member"
+          ).value
+        );
+      const rewardId =
+        Number(
+          document.getElementById(
+            "staff-reward"
+          ).value
+        );
+      const member =
+        getMember(memberId);
+      const reward =
+        data.rewards.find(
+          item => item.id === rewardId
+        );
+      if (!member || !reward) return;
+      if (member.points < reward.cost) {
+        showToast(
+          "แต้มของห้องนี้ไม่เพียงพอ"
+        );
+        return;
+      }
+      member.points -= reward.cost;
+      data.redemptions.push({
+        id: Date.now(),
+        memberId,
+        rewardId,
+        rewardName: reward.name,
+        icon: reward.icon,
+        cost: reward.cost,
+        date: getTodayThai()
+      });
+      saveData();
+      renderStaff();
+      showToast(
+        `ตัดแต้มสำเร็จ ${formatNumber(reward.cost)} แต้ม`
+      );
+    }
+    /* =========================================================
+       REGISTRATION: ROOMS
+    ========================================================= */
+    function registerRoom() {
+      const roomName =
+        document.getElementById("reg-room-name").value.trim();
+      const studentId =
+        document.getElementById("reg-room-studentid").value.trim();
+      const studentName =
+        document.getElementById("reg-room-studentname").value.trim();
+
+      if (!roomName || !studentId || !studentName) {
+        showToast("กรุณากรอกข้อมูลห้องให้ครบถ้วน");
+        return;
+      }
+      if (data.rooms.some(r => r.room === roomName)) {
+        showToast(`มีห้อง ${roomName} อยู่ในระบบแล้ว`);
+        return;
+      }
+
+      const newId =
+        data.rooms.length ?
+        Math.max(...data.rooms.map(r => r.id)) + 1 :
+        1;
+
+      data.rooms.push({ id: newId, room: roomName, studentId, studentName });
+      data.members.push({ id: newId, points: 0 });
+      saveData();
+
+      document.getElementById("reg-room-name").value = "";
+      document.getElementById("reg-room-studentid").value = "";
+      document.getElementById("reg-room-studentname").value = "";
+
+      populateLoginRoomSelector();
+      renderStaff();
+      showToast(`ลงทะเบียนห้อง ${roomName} สำเร็จ`);
+    }
+
+    function clearRoomHistory(roomId) {
+      const room = getRoomInfo(roomId);
+      if (!room) return;
+      const ok = confirm(
+        `ล้างประวัติการฝากขยะและรีเซ็ตแต้มของห้อง ${room.room} ใช่หรือไม่?`
+      );
+      if (!ok) return;
+
+      data.deposits = data.deposits.filter(d => d.memberId !== roomId);
+      data.redemptions = data.redemptions.filter(r => r.memberId !== roomId);
+      const member = getMember(roomId);
+      if (member) member.points = 0;
+      saveData();
+      renderStaff();
+      showToast(`ล้างประวัติห้อง ${room.room} เรียบร้อยแล้ว`);
+    }
+
+    function deleteRoom(roomId) {
+      const room = getRoomInfo(roomId);
+      if (!room) return;
+      const ok = confirm(
+        `ต้องการลบห้อง ${room.room} ออกจากระบบพร้อมประวัติทั้งหมดใช่หรือไม่?\nใช้เมื่อนักเรียนจบการศึกษา (ม.3 / ม.6)`
+      );
+      if (!ok) return;
+
+      data.deposits = data.deposits.filter(d => d.memberId !== roomId);
+      data.redemptions = data.redemptions.filter(r => r.memberId !== roomId);
+      data.rooms = data.rooms.filter(r => r.id !== roomId);
+      data.members = data.members.filter(m => m.id !== roomId);
+      saveData();
+
+      populateLoginRoomSelector();
+      renderStaff();
+      showToast(`ลบห้อง ${room.room} ออกจากระบบแล้ว`);
+    }
+
+    function renderRoomsManagement() {
+      const container = document.getElementById("rooms-management-list");
+      if (!container) return;
+      if (!data.rooms.length) {
+        container.innerHTML =
+          `<p class="text-sm text-slate-400 text-center py-6">ยังไม่มีห้องในระบบ</p>`;
+        return;
+      }
+      container.innerHTML =
+        data.rooms
+        .map(room => {
+          const member = getMember(room.id);
+          return `
+
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-slate-100 rounded-2xl p-4">
+
+            <div>
+              <p class="font-medium text-slate-800">ห้อง ${room.room}</p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                ${room.studentName} • รหัส ${room.studentId} • แต้มคงเหลือ ${formatNumber(member ? member.points : 0)}
+              </p>
+            </div>
+
+            <div class="flex gap-2 shrink-0">
+              <button onclick="clearRoomHistory(${room.id})" class="px-3 py-2 rounded-xl text-xs border border-amber-200 text-amber-600 hover:bg-amber-50 transition">
+                ล้างประวัติ
+              </button>
+              <button onclick="deleteRoom(${room.id})" class="px-3 py-2 rounded-xl text-xs border border-rose-200 text-rose-600 hover:bg-rose-50 transition">
+                ลบห้อง
+              </button>
+            </div>
+
+          </div>
+
+        `;
+        })
+        .join("");
+    }
+    /* =========================================================
+       REGISTRATION: STAFF ACCOUNTS
+    ========================================================= */
+    function registerStaff() {
+      const staffId =
+        document.getElementById("reg-staff-id").value.trim();
+      const staffName =
+        document.getElementById("reg-staff-name").value.trim();
+
+      if (!staffId || !staffName) {
+        showToast("กรุณากรอกข้อมูลเจ้าหน้าที่ให้ครบถ้วน");
+        return;
+      }
+      if (data.staffAccounts.some(s => s.id === staffId)) {
+        showToast("มีรหัสเจ้าหน้าที่นี้อยู่ในระบบแล้ว");
+        return;
+      }
+
+      data.staffAccounts.push({ id: staffId, name: staffName });
+      saveData();
+
+      document.getElementById("reg-staff-id").value = "";
+      document.getElementById("reg-staff-name").value = "";
+
+      renderStaff();
+      showToast(`เพิ่มเจ้าหน้าที่ ${staffName} สำเร็จ`);
+    }
+
+    function deleteStaffAccount(staffId) {
+      if (data.staffAccounts.length <= 1) {
+        showToast("ต้องมีเจ้าหน้าที่อย่างน้อย 1 คนในระบบ");
+        return;
+      }
+      const staff = data.staffAccounts.find(s => s.id === staffId);
+      if (!staff) return;
+      const ok = confirm(`ต้องการลบบัญชีเจ้าหน้าที่ ${staff.name} ใช่หรือไม่?`);
+      if (!ok) return;
+
+      data.staffAccounts = data.staffAccounts.filter(s => s.id !== staffId);
+      saveData();
+      renderStaff();
+      showToast(`ลบบัญชีเจ้าหน้าที่ ${staff.name} แล้ว`);
+    }
+
+    function renderStaffAccountsList() {
+      const container = document.getElementById("staff-management-list");
+      if (!container) return;
+      container.innerHTML =
+        data.staffAccounts
+        .map(staff => `
+
+        <div class="flex items-center justify-between gap-3 border border-slate-100 rounded-2xl p-4">
+
+          <div>
+            <p class="font-medium text-slate-800">${staff.name}</p>
+            <p class="text-xs text-slate-400 mt-0.5">รหัสเจ้าหน้าที่ ${staff.id}</p>
+          </div>
+
+          <button onclick="deleteStaffAccount('${staff.id}')" class="px-3 py-2 rounded-xl text-xs border border-rose-200 text-rose-600 hover:bg-rose-50 transition shrink-0">
+            ลบ
+          </button>
+
+        </div>
+
+      `)
+        .join("");
+    }
+    /* =========================================================
+       INITIALIZE
+    ========================================================= */
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+        populateLoginRoomSelector();
+        switchLoginTab("user");
+
+        if (session && session.role === "user") {
+          currentMemberId = session.roomId;
+          enterApp("user");
+        } else if (session && session.role === "staff") {
+          enterApp("staff");
+        } else {
+          document.getElementById("page-login").classList.add("active");
+        }
+      }
+    );
+  </script>
+
+</body>
+
+</html>
